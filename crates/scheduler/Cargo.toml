@@ -13,10 +13,10 @@ documentation = "https://docs.rs/slipstream-scheduler"
 
 [dependencies]
 serde = { workspace = true }
-slipstream-footprint = { path = "../footprint" }
+slipstream-footprint = { path = "../footprint", version = "0.1.0" }
 
 [dev-dependencies]
-slipstream-footprint = { path = "../footprint" }
+slipstream-footprint = { path = "../footprint", version = "0.1.0" }
 
 [[bench]]
 name = "scheduling"

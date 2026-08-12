@@ -15,6 +15,6 @@ documentation = "https://docs.rs/slipstream-replay"
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
-slipstream-footprint = { path = "../footprint" }
-slipstream-scheduler = { path = "../scheduler" }
-slipstream-score = { path = "../score" }
+slipstream-footprint = { path = "../footprint", version = "0.1.0" }
+slipstream-scheduler = { path = "../scheduler", version = "0.1.0" }
+slipstream-score = { path = "../score", version = "0.1.0" }

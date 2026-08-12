@@ -13,5 +13,5 @@ documentation = "https://docs.rs/slipstream-score"
 
 [dependencies]
 serde = { workspace = true }
-slipstream-footprint = { path = "../footprint" }
-slipstream-scheduler = { path = "../scheduler" }
+slipstream-footprint = { path = "../footprint", version = "0.1.0" }
+slipstream-scheduler = { path = "../scheduler", version = "0.1.0" }
