@@ -18,3 +18,8 @@ syn = { version = "2", features = ["full", "visit", "extra-traits"] }
 
 [dev-dependencies]
 serde_json = { workspace = true }
+criterion = { workspace = true }
+
+[[bench]]
+name = "analysis"
+harness = false
