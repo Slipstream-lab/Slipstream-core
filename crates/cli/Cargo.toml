@@ -7,22 +7,21 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "Slipstream command-line interface: scan, profile, simulate, diff."
+# The CLI is a workspace-internal binary and is not published to crates.io.
+publish = false
 
 [[bin]]
 name = "slipstream"
 path = "src/main.rs"
 
-# The CLI is a workspace-internal binary and is not published to crates.io.
-publish = false
-
 [dependencies]
 clap = { version = "4", features = ["derive"] }
 serde_json = { workspace = true }
-slipstream-analyzer = { path = "../analyzer" }
-slipstream-footprint = { path = "../footprint" }
-slipstream-replay = { path = "../replay" }
-slipstream-scheduler = { path = "../scheduler" }
-slipstream-score = { path = "../score" }
+slipstream-analyzer = { path = "../analyzer", version = "0.1.0" }
+slipstream-footprint = { path = "../footprint", version = "0.1.0" }
+slipstream-replay = { path = "../replay", version = "0.1.0" }
+slipstream-scheduler = { path = "../scheduler", version = "0.1.0" }
+slipstream-score = { path = "../score", version = "0.1.0" }
 
 [dev-dependencies]
 serde_json = { workspace = true }
