@@ -10,9 +10,9 @@
 //! The model is deterministic: identical inputs always yield identical
 //! schedules.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
-use slipstream_footprint::TransactionFootprint;
+use slipstream_footprint::{LedgerKey, TransactionFootprint};
 
 /// A set of transactions executed in the same stage. Members are indices into
 /// the input transaction list.
@@ -103,19 +103,49 @@ impl ConflictGraph {
 
 /// Builds the conflict graph over an ordered list of footprints.
 ///
-/// Complexity is O(n^2) key-set intersections; fine for the fixture-scale
-/// transaction sets Slipstream targets, and a documented target for
-/// optimization.
+/// Uses a per-key index: every key maps to the transactions that write it and
+/// the transactions that read it (read-only). Edges are emitted as write/write
+/// pairs within a key's writer list and write/read pairs between a key's
+/// writers and readers, then de-duplicated in a sorted set. This is near-linear
+/// in the total footprint size for workloads with bounded key fan-out, versus
+/// the naive O(n^2) pairwise comparison.
 pub fn build_conflict_graph(footprints: &[TransactionFootprint]) -> ConflictGraph {
     let n = footprints.len();
-    let mut adjacency: Vec<Vec<usize>> = vec![Vec::new(); n];
-    for i in 0..n {
-        for j in (i + 1)..n {
-            if footprints[i].conflicts_with(&footprints[j]) {
-                adjacency[i].push(j);
-                adjacency[j].push(i);
+    let mut index: BTreeMap<&LedgerKey, (Vec<usize>, Vec<usize>)> = BTreeMap::new();
+    for (i, fp) in footprints.iter().enumerate() {
+        for key in &fp.read_write {
+            index.entry(key).or_default().0.push(i);
+        }
+        for key in &fp.read_only {
+            index.entry(key).or_default().1.push(i);
+        }
+    }
+
+    let mut edges: BTreeSet<(usize, usize)> = BTreeSet::new();
+    for (writers, readers) in index.into_values() {
+        for a in 0..writers.len() {
+            for b in (a + 1)..writers.len() {
+                edges.insert((writers[a], writers[b]));
             }
         }
+        for &writer in &writers {
+            for &reader in &readers {
+                if writer != reader {
+                    let (lo, hi) = if writer < reader {
+                        (writer, reader)
+                    } else {
+                        (reader, writer)
+                    };
+                    edges.insert((lo, hi));
+                }
+            }
+        }
+    }
+
+    let mut adjacency: Vec<Vec<usize>> = vec![Vec::new(); n];
+    for (a, b) in edges {
+        adjacency[a].push(b);
+        adjacency[b].push(a);
     }
     ConflictGraph { adjacency }
 }
@@ -230,5 +260,44 @@ mod tests {
         assert_eq!(s.stage_count(), 5);
         assert_eq!(s.parallelism(), 1.0);
         assert!(s.is_complete(5));
+    }
+
+    /// Naive pairwise reference used only to verify the index-based builder.
+    fn naive_conflict_graph(footprints: &[TransactionFootprint]) -> ConflictGraph {
+        let n = footprints.len();
+        let mut adjacency: Vec<Vec<usize>> = vec![Vec::new(); n];
+        for i in 0..n {
+            for j in (i + 1)..n {
+                if footprints[i].conflicts_with(&footprints[j]) {
+                    adjacency[i].push(j);
+                    adjacency[j].push(i);
+                }
+            }
+        }
+        ConflictGraph { adjacency }
+    }
+
+    #[test]
+    fn index_graph_matches_naive_reference() {
+        let fps = vec![
+            hot_key(0),
+            hot_key(1),
+            hot_key(0),
+            TransactionFootprint::new().read(contract_data("C1", "key0")),
+            cold(5),
+            hot_key(2),
+            TransactionFootprint::new().read(contract_data("C1", "key1")),
+        ];
+        let fast = build_conflict_graph(&fps);
+        let naive = naive_conflict_graph(&fps);
+        assert_eq!(fast, naive);
+    }
+
+    #[test]
+    fn index_graph_empty_input() {
+        let fps: Vec<TransactionFootprint> = Vec::new();
+        let graph = build_conflict_graph(&fps);
+        assert_eq!(graph.order(), 0);
+        assert_eq!(graph.edge_count(), 0);
     }
 }
