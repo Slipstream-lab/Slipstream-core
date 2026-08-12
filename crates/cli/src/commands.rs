@@ -40,6 +40,10 @@ pub fn profile(fixture: &Path) -> Result<(), Box<dyn std::error::Error>> {
     println!("  stages:          {}", report.stage_count);
     println!("  parallelism:     {:.2}", report.parallelism);
     println!("  critical path:   {} txns", report.critical_path_length);
+    println!(
+        "  weighted crit.:  {} (read=1, write=2)",
+        report.weighted_critical_path_weight
+    );
     println!("  total conflicts: {}", report.total_conflicts);
     if !report.hot_keys.is_empty() {
         println!("  hot keys:");
@@ -78,6 +82,10 @@ pub fn simulate(
     println!("  stages:          {}", summary.stage_count);
     println!("  parallelism:     {:.2}", summary.parallelism);
     println!("  critical path:   {} txns", summary.critical_path.length);
+    println!(
+        "  weighted crit.:  {} (read=1, write=2)",
+        summary.weighted_critical_path.weight
+    );
     println!("  total conflicts: {}", summary.total_conflicts);
     println!("  top hot keys:");
     for hk in &summary.hot_keys {
