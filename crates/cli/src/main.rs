@@ -34,6 +34,9 @@ enum Command {
         /// Path to a transaction-set JSON fixture.
         #[arg(long)]
         fixture: PathBuf,
+        /// Emit machine-readable JSON.
+        #[arg(long)]
+        json: bool,
     },
     /// Simulate scheduling over a synthetic transaction set.
     Simulate {
@@ -63,7 +66,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
     match cli.command {
         Command::Scan { path, json } => commands::scan(&path, json),
-        Command::Profile { fixture } => commands::profile(&fixture),
+        Command::Profile { fixture, json } => commands::profile(&fixture, json),
         Command::Simulate {
             transactions,
             distinct,

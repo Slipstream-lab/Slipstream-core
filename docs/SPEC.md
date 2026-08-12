@@ -157,6 +157,11 @@ cli ──▶ replay ──▶ score ──▶ scheduler ──▶ footprint
 | `simulate`  | Scheduling/scoring over a deterministic synthetic set          |
 | `diff`      | Comparison of two implementations (naive vs optimized)         |
 
+`scan`, `profile` and `diff` accept `--json` for machine-readable output
+(`scan` emits an array of `AnalysisReport`, `profile` emits a `ProfileReport`
+including the full schedule, and `diff` emits the comparison document). These
+JSON shapes are the stable contract consumed by `slipstream-api`.
+
 ## 9. Determinism and correctness guarantees
 
 - All core algorithms are deterministic: identical input produces identical
