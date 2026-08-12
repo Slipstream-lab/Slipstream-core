@@ -32,6 +32,29 @@ assert!(schedule.is_complete(footprints.len()));
   conflict-free.
 - `serial_schedule`: the no-parallelism baseline for scoring.
 
+## Lanes (CAP-0063)
+
+CAP-0063 partitions transactions into concurrently-executing **lanes**, each
+scheduled as its own sequence of stages. Lane assignment is a pluggable policy
+(`LaneAssignment`), kept separate from stage construction:
+
+```rust
+use slipstream_scheduler::{schedule_lanes, SingleLane, RoundRobinLanes};
+
+// Default policy: one lane, identical to the flat `schedule`.
+let flat = schedule_lanes(&footprints, &SingleLane);
+
+// Structural baseline that exercises the multi-lane machinery.
+let lanes = schedule_lanes(&footprints, &RoundRobinLanes { lanes: 4 });
+assert!(lanes.is_conflict_free(&footprints)); // each lane's stages are valid
+```
+
+Aggregate metrics reduce to the single-lane `Schedule` values when there is one
+lane: `stage_span` is the **max** stage count over lanes, `total_transactions`
+the **sum** of lane widths, and `parallelism = total_transactions / stage_span`.
+A policy that places conflicting transactions in different lanes is not silently
+accepted — `LaneSchedule::cross_lane_conflicts` reports every such pair.
+
 ## License
 
 MIT
