@@ -7,6 +7,9 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "Historical transaction-set profiling from RPC / ledger archives for Slipstream."
+keywords.workspace = true
+categories.workspace = true
+documentation = "https://docs.rs/slipstream-replay"
 
 [dependencies]
 serde = { workspace = true }

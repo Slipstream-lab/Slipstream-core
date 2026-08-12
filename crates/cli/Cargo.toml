@@ -12,6 +12,9 @@ description = "Slipstream command-line interface: scan, profile, simulate, diff.
 name = "slipstream"
 path = "src/main.rs"
 
+# The CLI is a workspace-internal binary and is not published to crates.io.
+publish = false
+
 [dependencies]
 clap = { version = "4", features = ["derive"] }
 serde_json = { workspace = true }

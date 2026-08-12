@@ -7,6 +7,9 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "LedgerKey model, read/write set algebra and overlap analysis for Slipstream."
+keywords.workspace = true
+categories.workspace = true
+documentation = "https://docs.rs/slipstream-footprint"
 
 [dependencies]
 serde = { workspace = true }

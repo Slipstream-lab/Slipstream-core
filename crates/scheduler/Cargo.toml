@@ -7,6 +7,9 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "CAP-0063 inspired stage and cluster construction for Slipstream."
+keywords.workspace = true
+categories.workspace = true
+documentation = "https://docs.rs/slipstream-scheduler"
 
 [dependencies]
 serde = { workspace = true }

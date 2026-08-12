@@ -7,6 +7,9 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "Contention metrics, critical path and hot-key ranking for Slipstream."
+keywords.workspace = true
+categories.workspace = true
+documentation = "https://docs.rs/slipstream-score"
 
 [dependencies]
 serde = { workspace = true }
