@@ -44,4 +44,5 @@ fn main() {
     bench("small", 64, 8);
     bench("medium", 256, 32);
     bench("large", 1024, 128);
+    bench("xlarge", 4096, 512);
 }

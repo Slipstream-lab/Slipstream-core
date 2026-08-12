@@ -14,3 +14,7 @@ slipstream-footprint = { path = "../footprint" }
 
 [dev-dependencies]
 slipstream-footprint = { path = "../footprint" }
+
+[[bench]]
+name = "scheduling"
+harness = false
