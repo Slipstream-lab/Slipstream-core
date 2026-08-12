@@ -1,0 +1,155 @@
+{
+  "captured_from": "illustrative fixture: synthetic fragment modelling a sharded-counter workload. Not measured mainnet data; used for conformance and determinism testing.",
+  "records": [
+    {
+      "tx_hash": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "source_account": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1",
+      "footprint": {
+        "read_only": [
+          { "Account": { "account_id": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1" } },
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "state" } }
+        ],
+        "read_write": [
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "shard:0" } }
+        ]
+      }
+    },
+    {
+      "tx_hash": "0x0000000000000000000000000000000000000000000000000000000000000002",
+      "source_account": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA2",
+      "footprint": {
+        "read_only": [
+          { "Account": { "account_id": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA2" } },
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "state" } }
+        ],
+        "read_write": [
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "shard:1" } }
+        ]
+      }
+    },
+    {
+      "tx_hash": "0x0000000000000000000000000000000000000000000000000000000000000003",
+      "source_account": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3",
+      "footprint": {
+        "read_only": [
+          { "Account": { "account_id": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3" } }
+        ],
+        "read_write": [
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "shard:2" } }
+        ]
+      }
+    },
+    {
+      "tx_hash": "0x0000000000000000000000000000000000000000000000000000000000000004",
+      "source_account": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4",
+      "footprint": {
+        "read_only": [
+          { "Account": { "account_id": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4" } }
+        ],
+        "read_write": [
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "shard:0" } }
+        ]
+      }
+    },
+    {
+      "tx_hash": "0x0000000000000000000000000000000000000000000000000000000000000005",
+      "source_account": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5",
+      "footprint": {
+        "read_only": [
+          { "Account": { "account_id": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5" } }
+        ],
+        "read_write": [
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "shard:1" } }
+        ]
+      }
+    },
+    {
+      "tx_hash": "0x0000000000000000000000000000000000000000000000000000000000000006",
+      "source_account": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA6",
+      "footprint": {
+        "read_only": [
+          { "Account": { "account_id": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA6" } }
+        ],
+        "read_write": [
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "shard:2" } }
+        ]
+      }
+    },
+    {
+      "tx_hash": "0x0000000000000000000000000000000000000000000000000000000000000007",
+      "source_account": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7",
+      "footprint": {
+        "read_only": [
+          { "Account": { "account_id": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7" } },
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "state" } }
+        ],
+        "read_write": [
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "shard:0" } }
+        ]
+      }
+    },
+    {
+      "tx_hash": "0x0000000000000000000000000000000000000000000000000000000000000008",
+      "source_account": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8",
+      "footprint": {
+        "read_only": [
+          { "Account": { "account_id": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8" } }
+        ],
+        "read_write": [
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "shard:1" } }
+        ]
+      }
+    },
+    {
+      "tx_hash": "0x0000000000000000000000000000000000000000000000000000000000000009",
+      "source_account": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9",
+      "footprint": {
+        "read_only": [
+          { "Account": { "account_id": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9" } }
+        ],
+        "read_write": [
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "shard:2" } }
+        ]
+      }
+    },
+    {
+      "tx_hash": "0x000000000000000000000000000000000000000000000000000000000000000a",
+      "source_account": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa",
+      "footprint": {
+        "read_only": [
+          { "Account": { "account_id": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa" } },
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "config" } }
+        ],
+        "read_write": [
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "user:u1" } }
+        ]
+      }
+    },
+    {
+      "tx_hash": "0x000000000000000000000000000000000000000000000000000000000000000b",
+      "source_account": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAb",
+      "footprint": {
+        "read_only": [
+          { "Account": { "account_id": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAb" } },
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "config" } }
+        ],
+        "read_write": [
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "user:u2" } }
+        ]
+      }
+    },
+    {
+      "tx_hash": "0x000000000000000000000000000000000000000000000000000000000000000c",
+      "source_account": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAc",
+      "footprint": {
+        "read_only": [
+          { "Account": { "account_id": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAc" } },
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "config" } }
+        ],
+        "read_write": [
+          { "ContractData": { "contract_id": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1", "key": "user:u3" } }
+        ]
+      }
+    }
+  ]
+}

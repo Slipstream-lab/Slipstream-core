@@ -1,0 +1,25 @@
+[package]
+name = "slipstream-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "Slipstream command-line interface: scan, profile, simulate, diff."
+
+[[bin]]
+name = "slipstream"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde_json = { workspace = true }
+slipstream-analyzer = { path = "../analyzer" }
+slipstream-footprint = { path = "../footprint" }
+slipstream-replay = { path = "../replay" }
+slipstream-scheduler = { path = "../scheduler" }
+slipstream-score = { path = "../score" }
+
+[dev-dependencies]
+serde_json = { workspace = true }

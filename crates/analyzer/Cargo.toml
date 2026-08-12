@@ -1,0 +1,17 @@
+[package]
+name = "slipstream-analyzer"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "syn-based static footprint inference and contention detectors for Slipstream."
+
+[dependencies]
+serde = { workspace = true }
+thiserror = { workspace = true }
+syn = { version = "2", features = ["full", "visit", "extra-traits"] }
+
+[dev-dependencies]
+serde_json = { workspace = true }

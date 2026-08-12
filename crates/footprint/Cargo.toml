@@ -1,0 +1,15 @@
+[package]
+name = "slipstream-footprint"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "LedgerKey model, read/write set algebra and overlap analysis for Slipstream."
+
+[dependencies]
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

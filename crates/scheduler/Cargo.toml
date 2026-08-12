@@ -1,0 +1,16 @@
+[package]
+name = "slipstream-scheduler"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "CAP-0063 inspired stage and cluster construction for Slipstream."
+
+[dependencies]
+serde = { workspace = true }
+slipstream-footprint = { path = "../footprint" }
+
+[dev-dependencies]
+slipstream-footprint = { path = "../footprint" }
