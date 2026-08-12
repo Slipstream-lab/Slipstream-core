@@ -120,3 +120,48 @@ impl Sharded {
     let stdout = String::from_utf8_lossy(&out.stdout);
     assert!(stdout.contains("detector findings"), "{stdout}");
 }
+
+#[test]
+fn diff_json_output_is_stable_and_valid() {
+    let dir = temp_dir("diff-json");
+    let naive = dir.join("naive.rs");
+    let optimized = dir.join("optimized.rs");
+    fs::write(&naive, GLOBAL_COUNTER).expect("write naive");
+    let optimized_src = r#"
+#![no_std]
+use soroban_sdk::{contract, contractimpl, symbol_short, Env};
+
+#[contract]
+pub struct Sharded;
+
+#[contractimpl]
+impl Sharded {
+    pub fn increment(env: Env, shard: u32) -> u32 {
+        let mut count: u32 = env.storage().instance().get(&symbol_short!("shard")).unwrap_or(0);
+        count += 1;
+        env.storage().instance().put(&symbol_short!("shard"), &count);
+        count
+    }
+}
+"#;
+    fs::write(&optimized, optimized_src).expect("write optimized");
+    let args = [
+        "diff",
+        "--json",
+        naive.to_str().unwrap(),
+        optimized.to_str().unwrap(),
+    ];
+    let out1 = slipstream(&args);
+    let out2 = slipstream(&args);
+    assert!(out1.status.success(), "{out1:?}");
+    assert_eq!(
+        out1.stdout, out2.stdout,
+        "diff --json must be deterministic"
+    );
+    let stdout = String::from_utf8_lossy(&out1.stdout);
+    let parsed: serde_json::Value = serde_json::from_str(&stdout).expect("valid json");
+    assert!(parsed["left"].is_object());
+    assert!(parsed["right"].is_object());
+    assert!(parsed["summary"]["detector_findings_delta"].is_i64());
+    assert!(parsed["per_function_deltas"].is_array());
+}
