@@ -97,9 +97,12 @@ pub fn simulate(
     Ok(())
 }
 
-pub fn diff(left: &Path, right: &Path) -> Result<(), Box<dyn std::error::Error>> {
+pub fn diff(left: &Path, right: &Path, json: bool) -> Result<(), Box<dyn std::error::Error>> {
     let left_reports = analyze_path(left)?;
     let right_reports = analyze_path(right)?;
+    if json {
+        return print_diff_json(left, &left_reports, right, &right_reports);
+    }
     let left_totals = aggregate(&left_reports);
     let right_totals = aggregate(&right_reports);
 
@@ -151,6 +154,83 @@ fn analyze_path(path: &Path) -> Result<Vec<AnalysisReport>, Box<dyn std::error::
         .map(analyze_file)
         .collect::<Result<Vec<_>, _>>()
         .map_err(|e| e.into())
+}
+
+fn totals_json(path: &Path, reports: &[AnalysisReport]) -> serde_json::Value {
+    let totals = aggregate(reports);
+    let detectors: serde_json::Map<String, serde_json::Value> = totals
+        .detectors
+        .iter()
+        .map(|(k, v)| (k.clone(), serde_json::Value::from(*v)))
+        .collect();
+    serde_json::json!({
+        "path": path.display().to_string(),
+        "files": totals.files,
+        "functions": totals.functions,
+        "storage_reads": totals.reads,
+        "storage_writes": totals.writes,
+        "detector_findings": totals.detectors.values().sum::<usize>(),
+        "detectors": detectors,
+    })
+}
+
+fn per_function_metrics(reports: &[AnalysisReport]) -> BTreeMap<String, (usize, usize)> {
+    let mut out: BTreeMap<String, (usize, usize)> = BTreeMap::new();
+    for report in reports {
+        for f in &report.functions {
+            let entry = out.entry(f.function_name.clone()).or_default();
+            entry.0 += f.storage_reads.len();
+            entry.1 += f.storage_writes.len();
+        }
+    }
+    out
+}
+
+fn print_diff_json(
+    left: &Path,
+    left_reports: &[AnalysisReport],
+    right: &Path,
+    right_reports: &[AnalysisReport],
+) -> Result<(), Box<dyn std::error::Error>> {
+    let l = totals_json(left, left_reports);
+    let r = totals_json(right, right_reports);
+    let lf = per_function_metrics(left_reports);
+    let rf = per_function_metrics(right_reports);
+    let deltas: Vec<serde_json::Value> = lf
+        .keys()
+        .chain(rf.keys())
+        .collect::<std::collections::BTreeSet<_>>()
+        .into_iter()
+        .map(|name| {
+            let l = lf.get(name).copied().unwrap_or((0, 0));
+            let rr = rf.get(name).copied().unwrap_or((0, 0));
+            serde_json::json!({
+                "function": name,
+                "reads_delta": rr.0 as i64 - l.0 as i64,
+                "writes_delta": rr.1 as i64 - l.1 as i64,
+            })
+        })
+        .collect();
+    let l_findings = l["detector_findings"].as_u64().unwrap_or(0) as i64;
+    let r_findings = r["detector_findings"].as_u64().unwrap_or(0) as i64;
+    let l_reads = l["storage_reads"].as_u64().unwrap_or(0) as i64;
+    let r_reads = r["storage_reads"].as_u64().unwrap_or(0) as i64;
+    let l_writes = l["storage_writes"].as_u64().unwrap_or(0) as i64;
+    let r_writes = r["storage_writes"].as_u64().unwrap_or(0) as i64;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&serde_json::json!({
+            "left": l,
+            "right": r,
+            "per_function_deltas": deltas,
+            "summary": {
+                "detector_findings_delta": r_findings - l_findings,
+                "storage_reads_delta": r_reads - l_reads,
+                "storage_writes_delta": r_writes - l_writes,
+            },
+        }))?
+    );
+    Ok(())
 }
 
 fn print_scan_report(report: &AnalysisReport) {

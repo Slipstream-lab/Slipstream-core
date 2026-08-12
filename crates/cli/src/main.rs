@@ -53,6 +53,9 @@ enum Command {
         left: PathBuf,
         /// Right implementation (file or directory).
         right: PathBuf,
+        /// Emit machine-readable JSON.
+        #[arg(long)]
+        json: bool,
     },
 }
 
@@ -66,6 +69,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             distinct,
             seed,
         } => commands::simulate(transactions, distinct, seed),
-        Command::Diff { left, right } => commands::diff(&left, &right),
+        Command::Diff { left, right, json } => commands::diff(&left, &right, json),
     }
 }
