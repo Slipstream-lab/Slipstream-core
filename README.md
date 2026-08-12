@@ -38,6 +38,9 @@ slipstream scan path/to/contracts
 # Profile a recorded transaction set (fixture or future RPC source)
 slipstream profile --fixture fixtures/mainnet_fragment.json
 
+# ...or as machine-readable JSON for the API/web layers
+slipstream profile --fixture fixtures/mainnet_fragment.json --json
+
 # Simulate scheduling over a synthetic transaction set
 slipstream simulate --transactions 128 --seed 42
 

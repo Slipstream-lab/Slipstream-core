@@ -81,6 +81,39 @@ fn profile_prints_summary_for_fixture() {
 }
 
 #[test]
+fn profile_json_output_is_valid_and_matches_summary() {
+    let fixture = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("..")
+        .join("..")
+        .join("fixtures")
+        .join("mainnet_fragment.json");
+    let args = ["profile", "--fixture", fixture.to_str().unwrap(), "--json"];
+    let out1 = slipstream(&args);
+    let out2 = slipstream(&args);
+    assert!(out1.status.success(), "{out1:?}");
+    assert_eq!(
+        out1.stdout, out2.stdout,
+        "profile --json must be deterministic"
+    );
+    let stdout = String::from_utf8_lossy(&out1.stdout);
+    let parsed: serde_json::Value = serde_json::from_str(&stdout).expect("valid json");
+    // The JSON must expose the full ProfileReport contract downstream relies on.
+    assert!(parsed["transaction_count"].is_u64());
+    assert!(parsed["stage_count"].is_u64());
+    assert!(parsed["parallelism"].is_number());
+    assert!(parsed["critical_path_length"].is_u64());
+    assert!(parsed["weighted_critical_path_weight"].is_u64());
+    assert!(parsed["total_conflicts"].is_u64());
+    assert!(parsed["hot_keys"].is_array());
+    assert!(
+        parsed["schedule"]["stages"].is_array(),
+        "the full schedule must be included: {stdout}"
+    );
+    // The JSON path must produce nothing but JSON (no human-readable preamble).
+    assert!(!stdout.contains("profile:"), "{stdout}");
+}
+
+#[test]
 fn simulate_runs_deterministically() {
     let out1 = slipstream(&["simulate", "--transactions", "64", "--seed", "7"]);
     let out2 = slipstream(&["simulate", "--transactions", "64", "--seed", "7"]);

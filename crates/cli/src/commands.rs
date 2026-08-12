@@ -30,10 +30,14 @@ pub fn scan(path: &Path, json: bool) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-pub fn profile(fixture: &Path) -> Result<(), Box<dyn std::error::Error>> {
+pub fn profile(fixture: &Path, json: bool) -> Result<(), Box<dyn std::error::Error>> {
     let source = FixtureSource::new(fixture);
     let set = source.load()?;
     let report = profile_set(&set);
+    if json {
+        println!("{}", serde_json::to_string_pretty(&report)?);
+        return Ok(());
+    }
     println!("profile: {}", report.source);
     println!("  transactions:    {}", report.transaction_count);
     println!("  distinct keys:   {}", report.distinct_keys);
