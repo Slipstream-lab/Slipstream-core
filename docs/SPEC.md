@@ -51,6 +51,9 @@ as:
 
 - a **conflict graph** — vertices are transactions, edges connect conflicting
   pairs (built in O(n^2) key-set intersections);
+- a **conflict graph** — vertices are transactions, edges connect conflicting
+  pairs. Built in near-linear time (for bounded per-key fan-out) via a per-key
+  index of writers and readers, rather than O(n^2) pairwise intersection;
 - a **schedule** — an ordered list of *clusters* (stages), each a set of
   mutually conflict-free transactions;
 - a **greedy stage assignment** — each transaction, in index order, is placed
@@ -59,6 +62,37 @@ as:
 The greedy scheduler is deterministic and produces a valid (conflict-free,
 complete) schedule for any input. It is not optimal; improving it is tracked
 as a roadmap item.
+
+### 3.1 Lanes
+
+CAP-0063 additionally partitions transactions into **lanes** that are intended
+to run concurrently, each lane scheduled as its own sequence of stages.
+Slipstream keeps the two concerns separate:
+
+- **Lane assignment** (`LaneAssignment`) is a pluggable policy that partitions
+  transactions into lanes. This is where contention-aware domain knowledge
+  belongs; the model does not commit to a production policy. The default
+  `SingleLane` places every transaction in one lane and reproduces the flat
+  `Schedule` and its metrics *exactly*. `RoundRobinLanes` is a structural
+  baseline used to exercise the machinery.
+- **Stage construction** is unchanged: each lane's transactions are scheduled
+  with the same greedy colorer.
+
+A `LaneSchedule`'s aggregate metrics are defined so the single-lane case
+matches `Schedule` exactly:
+
+- `stage_span` = **max** stage count over lanes — the number of sequential
+  stage barriers on the critical (widest) lane, i.e. the parallel span of the
+  whole schedule when lanes run concurrently;
+- `total_transactions` = **sum** of lane widths;
+- `parallelism` = `total_transactions / stage_span` — average transactions
+  committed per sequential stage across all concurrently-running lanes.
+
+Because lane assignment is decoupled from stage construction, a policy may
+place conflicting transactions in different lanes. Such pairs are surfaced
+explicitly as `cross_lane_conflicts` rather than silently hidden: a safe,
+contention-aware policy yields none, and the model makes an unsafe partition
+observable and testable.
 
 ## 4. Contention scoring
 
