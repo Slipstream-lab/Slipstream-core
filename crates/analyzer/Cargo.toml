@@ -7,6 +7,9 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "syn-based static footprint inference and contention detectors for Slipstream."
+keywords.workspace = true
+categories.workspace = true
+documentation = "https://docs.rs/slipstream-analyzer"
 
 [dependencies]
 serde = { workspace = true }

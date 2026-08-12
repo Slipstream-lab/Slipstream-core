@@ -17,6 +17,8 @@ license = "MIT"
 authors = ["Slipstream Lab"]
 repository = "https://github.com/Slipstream-lab/Slipstream-core"
 description = "Slipstream core analytical engine: transaction-footprint analysis, contention analysis, CAP-0063 scheduling, static analysis, replay and scoring."
+keywords = ["stellar", "soroban", "smart-contracts", "blockchain", "analytics"]
+categories = ["algorithms", "data-structures", "command-line-utilities"]
 
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }
