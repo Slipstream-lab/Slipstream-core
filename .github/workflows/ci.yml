@@ -45,9 +45,11 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      - name: Verify library crates package cleanly
-        run: |
-          for crate in slipstream-footprint slipstream-scheduler slipstream-score \
-                       slipstream-analyzer slipstream-replay; do
-            cargo publish --dry-run -p "$crate"
-          done
+      - name: Verify crates package and verify cleanly
+        # `cargo package --workspace` packages every crate and verifies it by
+        # building from the packaged sources, resolving internal dependencies
+        # against the locally-packaged versions. This is the correct pre-publish
+        # check for a workspace whose crates depend on each other but are not
+        # yet on crates.io (a per-crate `cargo publish --dry-run` cannot resolve
+        # the unpublished internal deps).
+        run: cargo package --workspace
