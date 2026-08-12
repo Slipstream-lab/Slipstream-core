@@ -17,6 +17,7 @@ slipstream-footprint = { path = "../footprint", version = "0.1.0" }
 
 [dev-dependencies]
 slipstream-footprint = { path = "../footprint", version = "0.1.0" }
+criterion = { workspace = true }
 
 [[bench]]
 name = "scheduling"
