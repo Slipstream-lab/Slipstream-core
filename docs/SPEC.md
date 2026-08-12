@@ -71,6 +71,14 @@ transaction sets:
   order. Because conflict edges are directed forward in index order, the
   conflict graph is a DAG and the longest path is well defined; it is a lower
   bound on the serial depth of the workload.
+- **Weighted critical path** — the same chain, but each transaction contributes
+  its access cost under a [`CostModel`] (default: read = 1, write = 2). This
+  ranks *why* a workload is slow: a heavy transaction on a short chain can
+  dominate a longer chain of cheap ones.
+- **Key contention contribution** — conflict cost attributed to the key that
+  caused it (write/write pairs count double the write cost, write/read pairs
+  count write + read), ranked by cost. This surfaces the concrete keys to
+  shard or de-amp.
 - **Parallelism** — average transactions per stage (`n_txns / stages`).
 - **Hot-key ranking** — keys ordered by writes (primary) and reads
   (secondary). Hot keys are the concrete targets of contract optimization.

@@ -168,6 +168,7 @@ pub struct ProfileReport {
     pub stage_count: usize,
     pub parallelism: f64,
     pub critical_path_length: usize,
+    pub weighted_critical_path_weight: u64,
     pub total_conflicts: usize,
     pub hot_keys: Vec<slipstream_score::HotKey>,
     /// The full schedule, for inspection and visualization.
@@ -195,6 +196,7 @@ pub fn profile(set: &TransactionSet) -> ProfileReport {
         stage_count: summary.stage_count,
         parallelism: summary.parallelism,
         critical_path_length: summary.critical_path.length,
+        weighted_critical_path_weight: summary.weighted_critical_path.weight,
         total_conflicts: summary.total_conflicts,
         hot_keys: summary.hot_keys,
         schedule: sched,
