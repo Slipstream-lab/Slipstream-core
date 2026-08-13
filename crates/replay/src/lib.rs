@@ -7,6 +7,9 @@
 //!
 //! - [`FixtureSource`] reads the JSON transaction sets under `fixtures/`
 //!   (deterministic, fully tested).
+//! - [`RecordedCaptureSource`] reads a recorded network capture document —
+//!   real, provenance-labelled data from a live network (see
+//!   `fixtures/README.md`). No footprints are fabricated.
 //! - [`ArchiveProfileSource`] reads a ledger-archive capture document — the
 //!   minimal XDR capture subset encoded by [`xdr`] — and is the wired-up path
 //!   for historical replay.
@@ -240,6 +243,108 @@ pub fn load_fixture(path: &Path) -> Result<TransactionSet, ReplayError> {
         path: path.to_path_buf(),
         source,
     })
+}
+
+/// Schema for a *recorded* network capture (see `fixtures/README.md`).
+///
+/// Written by `tools/capture_mainnet.py`. Unlike the illustrative fixtures it
+/// carries only what can be vouched for from the live network — hashes, source
+/// accounts, statuses, ledger numbers and raw XDR — and explicitly does not
+/// fabricate footprints.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RecordedCapture {
+    /// Provenance note recorded at capture time.
+    pub captured_from: String,
+    pub network: String,
+    pub ledger_range: RecordedLedgerRange,
+    pub capture_tool: String,
+    pub capture_time: String,
+    pub rpc_endpoint: String,
+    pub latest_ledger_at_capture: u32,
+    pub counts: RecordedCounts,
+    /// The ledgers actually present in `transactions` (subset of the range).
+    pub ledgers: Vec<u32>,
+    pub transactions: Vec<RecordedTransaction>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RecordedLedgerRange {
+    pub from: u32,
+    pub to: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RecordedCounts {
+    pub total: usize,
+    pub success: usize,
+    pub failed: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RecordedTransaction {
+    pub tx_hash: String,
+    pub source_account: String,
+    pub status: String,
+    pub ledger: u32,
+    pub created_at: u64,
+    #[serde(rename = "envelopeXdr")]
+    pub envelope_xdr: String,
+    #[serde(rename = "resultMetaXdr")]
+    pub result_meta_xdr: String,
+}
+
+/// Loads a recorded network capture document into a transaction set.
+///
+/// The recorded format deliberately omits decoded footprints (they are not
+/// vouchable from the raw capture); records therefore carry empty footprints
+/// and the set is used for conformance and determinism checks rather than
+/// contention scoring.
+#[derive(Debug, Clone)]
+pub struct RecordedCaptureSource {
+    pub path: PathBuf,
+}
+
+impl RecordedCaptureSource {
+    pub fn new(path: impl AsRef<Path>) -> Self {
+        RecordedCaptureSource {
+            path: path.as_ref().to_path_buf(),
+        }
+    }
+
+    /// Loads and validates the recorded capture document.
+    pub fn load_capture(&self) -> Result<RecordedCapture, ReplayError> {
+        let raw = std::fs::read_to_string(&self.path).map_err(|source| ReplayError::Read {
+            path: self.path.clone(),
+            source,
+        })?;
+        serde_json::from_str(&raw).map_err(|source| ReplayError::Parse {
+            path: self.path.clone(),
+            source,
+        })
+    }
+}
+
+impl ProfileSource for RecordedCaptureSource {
+    fn name(&self) -> &str {
+        "recorded-capture"
+    }
+
+    fn load(&self) -> Result<TransactionSet, ReplayError> {
+        let capture = self.load_capture()?;
+        let records = capture
+            .transactions
+            .iter()
+            .map(|t| TransactionRecord {
+                tx_hash: t.tx_hash.clone(),
+                source_account: t.source_account.clone(),
+                footprint: TransactionFootprint::new(),
+            })
+            .collect();
+        Ok(TransactionSet {
+            captured_from: Some(capture.captured_from),
+            records,
+        })
+    }
 }
 
 /// The result of profiling one transaction set.
