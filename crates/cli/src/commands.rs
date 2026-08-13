@@ -3,7 +3,7 @@
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
-use slipstream_analyzer::{analyze_file, AnalysisReport};
+use slipstream_analyzer::{analyze_files, AnalysisReport};
 use slipstream_footprint::keys::contract_data;
 use slipstream_footprint::TransactionFootprint;
 use slipstream_replay::{profile as profile_set, FixtureSource, ProfileSource};
@@ -15,10 +15,7 @@ pub fn scan(path: &Path, json: bool) -> Result<(), Box<dyn std::error::Error>> {
     if files.is_empty() {
         eprintln!("slipstream: no `.rs` files found under {}", path.display());
     }
-    let mut reports = Vec::new();
-    for file in &files {
-        reports.push(analyze_file(file)?);
-    }
+    let reports = analyze_files(&files)?;
     if json {
         println!("{}", serde_json::to_string_pretty(&reports)?);
     } else {
@@ -153,11 +150,8 @@ fn collect_rs_files(path: &Path) -> Result<Vec<PathBuf>, Box<dyn std::error::Err
 }
 
 fn analyze_path(path: &Path) -> Result<Vec<AnalysisReport>, Box<dyn std::error::Error>> {
-    collect_rs_files(path)?
-        .iter()
-        .map(analyze_file)
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|e| e.into())
+    let files = collect_rs_files(path)?;
+    analyze_files(&files).map_err(|e| e.into())
 }
 
 fn totals_json(path: &Path, reports: &[AnalysisReport]) -> serde_json::Value {
