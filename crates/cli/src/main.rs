@@ -29,11 +29,20 @@ enum Command {
         #[arg(long)]
         json: bool,
     },
-    /// Profile a recorded transaction set (JSON fixture for now).
+    /// Profile a recorded transaction set (JSON fixture or XDR archive capture).
     Profile {
         /// Path to a transaction-set JSON fixture.
         #[arg(long)]
-        fixture: PathBuf,
+        fixture: Option<PathBuf>,
+        /// Path to a ledger-archive capture document (XDR).
+        #[arg(long)]
+        archive: Option<PathBuf>,
+        /// First ledger in the archive range (provenance only).
+        #[arg(long)]
+        from: Option<u32>,
+        /// Last ledger in the archive range (provenance only).
+        #[arg(long)]
+        to: Option<u32>,
         /// Emit machine-readable JSON.
         #[arg(long)]
         json: bool,
@@ -66,7 +75,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
     match cli.command {
         Command::Scan { path, json } => commands::scan(&path, json),
-        Command::Profile { fixture, json } => commands::profile(&fixture, json),
+        Command::Profile {
+            fixture,
+            archive,
+            from,
+            to,
+            json,
+        } => commands::profile(fixture.as_deref(), archive.as_deref(), from, to, json),
         Command::Simulate {
             transactions,
             distinct,

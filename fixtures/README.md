@@ -24,6 +24,13 @@ Each record:
 (externally tagged JSON, e.g. `{ "ContractData": { "contract_id": "...",
 "key": "shard:0" } }`).
 
+## Ledger-archive captures
+
+`archive/capture.xdr` is a binary capture in the Slipstream capture XDR subset
+(documented in `crates/replay/src/xdr.rs`), paired with a JSON manifest
+(`archive/manifest.json`). It is a truncated, illustrative capture used to
+exercise the ledger-archive replay path; see `archive/README.md`.
+
 ## Provenance policy
 
 Fixtures are labelled with their provenance. Files whose data was *measured*

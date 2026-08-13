@@ -114,6 +114,57 @@ fn profile_json_output_is_valid_and_matches_summary() {
 }
 
 #[test]
+fn profile_archive_capture_works_end_to_end() {
+    let capture = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("..")
+        .join("..")
+        .join("fixtures")
+        .join("archive")
+        .join("capture.xdr");
+    let out = slipstream(&[
+        "profile",
+        "--archive",
+        capture.to_str().unwrap(),
+        "--from",
+        "100",
+        "--to",
+        "103",
+    ]);
+    assert!(out.status.success(), "{out:?}");
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    assert!(stdout.contains("transactions:"), "{stdout}");
+    assert!(stdout.contains("ledger-archive"), "{stdout}");
+
+    let jout = slipstream(&[
+        "profile",
+        "--archive",
+        capture.to_str().unwrap(),
+        "--from",
+        "100",
+        "--to",
+        "103",
+        "--json",
+    ]);
+    assert!(jout.status.success(), "{jout:?}");
+    let jstdout = String::from_utf8_lossy(&jout.stdout);
+    let parsed: serde_json::Value = serde_json::from_str(&jstdout).expect("valid json");
+    assert_eq!(parsed["transaction_count"], 3);
+    assert!(parsed["hot_keys"].is_array());
+    assert!(!jstdout.contains("profile:"), "{jstdout}");
+}
+
+#[test]
+fn profile_requires_exactly_one_source() {
+    let out = slipstream(&["profile"]);
+    assert!(!out.status.success(), "no source must fail");
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        stderr.contains("--fixture") || stderr.contains("--archive"),
+        "{stderr}"
+    );
+}
+
+#[test]
 fn simulate_runs_deterministically() {
     let out1 = slipstream(&["simulate", "--transactions", "64", "--seed", "7"]);
     let out2 = slipstream(&["simulate", "--transactions", "64", "--seed", "7"]);

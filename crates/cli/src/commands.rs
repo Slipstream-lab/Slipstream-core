@@ -6,7 +6,9 @@ use std::path::{Path, PathBuf};
 use slipstream_analyzer::{analyze_files, AnalysisReport};
 use slipstream_footprint::keys::contract_data;
 use slipstream_footprint::TransactionFootprint;
-use slipstream_replay::{profile as profile_set, FixtureSource, ProfileSource};
+use slipstream_replay::{
+    profile as profile_set, ArchiveProfileSource, FixtureSource, ProfileSource,
+};
 use slipstream_scheduler::{schedule, Schedule};
 use slipstream_score::summarize;
 
@@ -27,9 +29,27 @@ pub fn scan(path: &Path, json: bool) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-pub fn profile(fixture: &Path, json: bool) -> Result<(), Box<dyn std::error::Error>> {
-    let source = FixtureSource::new(fixture);
-    let set = source.load()?;
+pub fn profile(
+    fixture: Option<&Path>,
+    archive: Option<&Path>,
+    from: Option<u32>,
+    to: Option<u32>,
+    json: bool,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let set = match (fixture, archive) {
+        (Some(path), None) => FixtureSource::new(path).load()?,
+        (None, Some(path)) => {
+            let source = ArchiveProfileSource {
+                bucket_path: path.display().to_string(),
+                from_ledger: from.unwrap_or(0),
+                to_ledger: to.unwrap_or(0),
+            };
+            source.load()?
+        }
+        _ => {
+            return Err("profile requires exactly one of --fixture or --archive".into());
+        }
+    };
     let report = profile_set(&set);
     if json {
         println!("{}", serde_json::to_string_pretty(&report)?);
